@@ -31,7 +31,7 @@
   .me { background: #2b5278; color: white; align-self: flex-start; border-bottom-left-radius: 4px; }
   .other { background: #182533; color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
   .name { font-size: 11px; color: #6ab2f2; margin-bottom: 3px; font-weight: bold; }
-  .time { font-size: 10px; color: #708499; margin-top: 3px; }
+  .time { font-size: 10px; color: #708499; margin-top: 5px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 3px; }
   .input-box { background: #17212b; padding: 8px; display: flex; gap: 6px; flex-shrink: 0; }
   input#text { flex: 1; background: #242f3d; border: none; color: white; padding: 11px 14px; border-radius: 20px; outline: none; font-size: 14px; }
   input#text::placeholder { color: #708499; }
@@ -178,7 +178,12 @@ function loadMsgs() {
       const div = document.createElement('div');
       const mine = (m.user_id === MY_ID);
       div.className = 'msg ' + (mine ? 'me' : 'other');
-      div.innerHTML = (mine ? '' : '<div class="name">' + m.name + '</div>') + m.text + '<div class="time">' + m.time + '</div>';
+      const senderLine = mine 
+        ? 'شما — ' + m.time 
+        : m.name + ' — ' + m.time + ' پیام داد';
+      div.innerHTML = (mine ? '' : '<div class="name">' + m.name + '</div>') 
+        + m.text 
+        + '<div class="time">' + senderLine + '</div>';
       chat.appendChild(div);
     });
     chat.scrollTop = chat.scrollHeight;
@@ -193,4 +198,4 @@ document.getElementById('nameInput').addEventListener('keypress', e => {
 });
 </script>
 </body>
-</html>
+ </html>
