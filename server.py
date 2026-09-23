@@ -26,6 +26,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     fullname = db.Column(db.String(100), unique=True, nullable=False)
     code = db.Column(db.String(50), unique=True, nullable=False)
+    last_seen = db.Column(db.DateTime, default=iran_now)
     created_at = db.Column(db.DateTime, default=iran_now)
 
 class Contact(db.Model):
@@ -63,7 +64,34 @@ def login():
         user = User(fullname=fullname, code=code)
         db.session.add(user)
         db.session.commit()
+    user.last_seen = iran_now()
+    db.session.commit()
     return jsonify({'ok': True, 'user_id': user.id, 'fullname': user.fullname, 'code': user.code})
+
+@app.route('/heartbeat', methods=['POST'])
+def heartbeat():
+    data = request.json
+    user_id = data.get('user_id')
+    if not user_id:
+        return jsonify({'ok': False})
+    user = User.query.get(user_id)
+    if user:
+        user.last_seen = iran_now()
+        db.session.commit()
+    return jsonify({'ok': True})
+
+@app.route('/user-status/<int:user_id>')
+def user_status(user_id):
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({'ok': False})
+    diff = (iran_now() - user.last_seen).total_seconds()
+    online = diff < 30
+    return jsonify({
+        'ok': True,
+        'online': online,
+        'last_seen': user.last_seen.strftime('%H:%M')
+    })
 
 @app.route('/qr/<code>')
 def make_qr(code):
@@ -85,7 +113,6 @@ def user_by_code(code):
         return jsonify({'ok': False})
     return jsonify({'ok': True, 'user_id': user.id, 'fullname': user.fullname})
 
-# اضافه کردن مخاطب
 @app.route('/add-contact', methods=['POST'])
 def add_contact():
     data = request.json
@@ -100,7 +127,6 @@ def add_contact():
         db.session.commit()
     return jsonify({'ok': True})
 
-# گرفتن مخاطبین یه کاربر
 @app.route('/contacts/<int:user_id>')
 def get_contacts(user_id):
     contacts = Contact.query.filter_by(owner_id=user_id).all()
@@ -108,7 +134,14 @@ def get_contacts(user_id):
     for c in contacts:
         u = User.query.get(c.contact_id)
         if u:
-            result.append({'id': u.id, 'fullname': u.fullname})
+            diff = (iran_now() - u.last_seen).total_seconds()
+            online = diff < 30
+            result.append({
+                'id': u.id,
+                'fullname': u.fullname,
+                'online': online,
+                'last_seen': u.last_seen.strftime('%H:%M')
+            })
     return jsonify(result)
 
 @app.route('/send', methods=['POST'])
