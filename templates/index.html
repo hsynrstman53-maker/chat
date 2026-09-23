@@ -8,66 +8,95 @@
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; font-family: Tahoma, sans-serif; -webkit-tap-highlight-color: transparent; }
   html, body { height: 100%; overflow: hidden; }
-  body { background: #0e1621; display: flex; flex-direction: column; }
-
-  .login { position: fixed; inset: 0; background: #0e1621; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 30px; z-index: 100; }
-  .login h1 { color: white; font-size: 22px; margin-bottom: 20px; }
-  .login input { width: 100%; max-width: 300px; background: #242f3d; border: none; color: white; padding: 14px; border-radius: 12px; outline: none; font-size: 16px; margin-bottom: 12px; text-align: center; }
-  .login input::placeholder { color: #708499; }
-  .login button { width: 100%; max-width: 300px; background: #5288c1; color: white; border: none; padding: 14px; border-radius: 12px; font-size: 16px; cursor: pointer; font-weight: bold; }
-  .login button:active { background: #3d6b9e; }
-
-  .users-screen { position: fixed; inset: 0; background: #0e1621; display: flex; flex-direction: column; z-index: 90; }
-  .profile-bar { background: #17212b; color: white; padding: 12px 15px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #242f3d; }
-  .profile-avatar { width: 45px; height: 45px; background: #5288c1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold; }
+  body { background: var(--bg); display: flex; flex-direction: column; transition: background 0.3s; }
+  :root { --bg: #0e1621; --panel: #17212b; --panel2: #242f3d; --text: #ffffff; --text2: #708499; --accent: #5288c1; --accent2: #3d6b9e; --my-msg: #2b5278; --other-msg: #182533; --name: #6ab2f2; --online: #4caf50; }
+  body.light { --bg: #f0f2f5; --panel: #ffffff; --panel2: #e4e6eb; --text: #1c1e21; --text2: #65676b; --accent: #0088cc; --accent2: #006699; --my-msg: #0088cc; --other-msg: #e4e6eb; --name: #0088cc; --online: #4caf50; }
+  .login { position: fixed; inset: 0; background: var(--bg); display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 30px; z-index: 100; }
+  .login h1 { color: var(--text); font-size: 22px; margin-bottom: 20px; }
+  .login input { width: 100%; max-width: 300px; background: var(--panel2); border: none; color: var(--text); padding: 14px; border-radius: 12px; outline: none; font-size: 16px; margin-bottom: 12px; text-align: center; }
+  .login input::placeholder { color: var(--text2); }
+  .login button { width: 100%; max-width: 300px; background: var(--accent); color: white; border: none; padding: 14px; border-radius: 12px; font-size: 16px; cursor: pointer; font-weight: bold; }
+  .login button:active { background: var(--accent2); }
+  .users-screen { position: fixed; inset: 0; background: var(--bg); display: flex; flex-direction: column; z-index: 90; }
+  .profile-bar { background: var(--panel); color: var(--text); padding: 12px 15px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--panel2); cursor: pointer; }
+  .profile-bar:active { background: var(--panel2); }
+  .profile-avatar { width: 45px; height: 45px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold; color: white; }
   .profile-info { flex: 1; }
   .profile-name { font-size: 15px; font-weight: bold; }
-  .profile-code { font-size: 11px; color: #6ab2f2; font-family: monospace; margin-top: 2px; }
-  .users-header { background: #17212b; color: white; padding: 12px 15px; text-align: center; font-size: 16px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; gap: 8px; border-bottom: 1px solid #242f3d; }
+  .profile-code { font-size: 11px; color: var(--name); font-family: monospace; margin-top: 2px; }
+  .profile-arrow { color: var(--text2); font-size: 20px; }
+  .users-header { background: var(--panel); color: var(--text); padding: 12px 15px; text-align: center; font-size: 16px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; gap: 8px; border-bottom: 1px solid var(--panel2); }
   .users-header span { flex: 1; text-align: center; }
-  .hdr-btn { background: #5288c1; color: white; border: none; padding: 8px 12px; border-radius: 8px; font-size: 12px; cursor: pointer; white-space: nowrap; }
-  .hdr-btn:active { background: #3d6b9e; }
+  .hdr-btn { background: var(--accent); color: white; border: none; padding: 8px 12px; border-radius: 8px; font-size: 12px; cursor: pointer; white-space: nowrap; }
+  .hdr-btn:active { background: var(--accent2); }
   .users-list { flex: 1; overflow-y: auto; padding: 10px; }
-  .user-item { background: #17212b; color: white; padding: 12px 15px; margin-bottom: 8px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 12px; }
-  .user-item:active { background: #242f3d; }
-  .user-avatar { width: 40px; height: 40px; background: #5288c1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: bold; position: relative; }
-  .online-dot { position: absolute; bottom: 0; right: 0; width: 12px; height: 12px; border-radius: 50%; border: 2px solid #17212b; }
-  .online-dot.on { background: #4caf50; }
-  .online-dot.off { background: #708499; }
+  .user-item { background: var(--panel); color: var(--text); padding: 12px 15px; margin-bottom: 8px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 12px; }
+  .user-item:active { background: var(--panel2); }
+  .user-avatar { width: 40px; height: 40px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: bold; position: relative; color: white; }
+  .online-dot { position: absolute; bottom: 0; right: 0; width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--panel); }
+  .online-dot.on { background: var(--online); }
+  .online-dot.off { background: var(--text2); }
   .user-info { flex: 1; }
   .user-name { font-size: 14px; font-weight: bold; }
-  .user-status { font-size: 11px; color: #708499; margin-top: 2px; }
-  .user-status.online { color: #4caf50; }
-  .empty { color: #708499; text-align: center; padding: 30px; font-size: 14px; }
-  .new-chat { position: fixed; bottom: 20px; right: 20px; background: #5288c1; color: white; border: none; width: 60px; height: 60px; border-radius: 50%; font-size: 28px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.4); z-index: 95; }
-  .new-chat:active { background: #3d6b9e; }
-
-  .fullscreen { position: fixed; inset: 0; background: #0e1621; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; z-index: 110; }
-  .fullscreen h2 { color: white; font-size: 18px; margin-bottom: 20px; text-align: center; }
+  .user-status { font-size: 11px; color: var(--text2); margin-top: 2px; }
+  .user-status.online { color: var(--online); }
+  .empty { color: var(--text2); text-align: center; padding: 30px; font-size: 14px; }
+  .new-chat { position: fixed; bottom: 20px; right: 20px; background: var(--accent); color: white; border: none; width: 60px; height: 60px; border-radius: 50%; font-size: 28px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.4); z-index: 95; }
+  .new-chat:active { background: var(--accent2); }
+  .fullscreen { position: fixed; inset: 0; background: var(--bg); display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; z-index: 110; overflow-y: auto; }
+  .fullscreen h2 { color: var(--text); font-size: 18px; margin-bottom: 20px; text-align: center; }
   .fullscreen img { background: white; padding: 15px; border-radius: 15px; max-width: 250px; }
-  .fullscreen .code { color: #6ab2f2; font-size: 14px; margin-top: 15px; font-family: monospace; word-break: break-all; text-align: center; }
-  .fullscreen .close-btn { background: #5288c1; color: white; border: none; padding: 12px 30px; border-radius: 12px; font-size: 15px; cursor: pointer; margin-top: 20px; font-weight: bold; }
-
+  .fullscreen .code { color: var(--name); font-size: 14px; margin-top: 15px; font-family: monospace; word-break: break-all; text-align: center; }
+  .fullscreen .close-btn { background: var(--accent); color: white; border: none; padding: 12px 30px; border-radius: 12px; font-size: 15px; cursor: pointer; margin-top: 20px; font-weight: bold; }
   #reader { width: 100%; max-width: 350px; border-radius: 15px; overflow: hidden; }
-
-  .header { background: #17212b; color: white; padding: 12px; text-align: center; font-size: 16px; flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; }
-  .back-btn { background: transparent; color: #6ab2f2; border: none; font-size: 20px; cursor: pointer; padding: 5px 10px; }
+  .header { background: var(--panel); color: var(--text); padding: 12px; text-align: center; font-size: 16px; flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; }
+  .back-btn { background: transparent; color: var(--name); border: none; font-size: 20px; cursor: pointer; padding: 5px 10px; }
   .header-info { flex: 1; text-align: center; }
   .header-name { font-weight: bold; font-size: 15px; }
-  .header-status { font-size: 11px; color: #708499; margin-top: 2px; }
-  .header-status.online { color: #4caf50; }
+  .header-status { font-size: 11px; color: var(--text2); margin-top: 2px; }
+  .header-status.online { color: var(--online); }
   .chat { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 6px; }
-  .msg { max-width: 80%; padding: 8px 12px; border-radius: 14px; word-wrap: break-word; font-size: 14px; line-height: 1.4; }
-  .me { background: #2b5278; color: white; align-self: flex-start; border-bottom-left-radius: 4px; }
-  .other { background: #182533; color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
-  .name { font-size: 11px; color: #6ab2f2; margin-bottom: 3px; font-weight: bold; }
-  .time { font-size: 10px; color: #708499; margin-top: 5px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 3px; }
-  .input-box { background: #17212b; padding: 8px; display: flex; gap: 6px; flex-shrink: 0; }
-  input#text { flex: 1; background: #242f3d; border: none; color: white; padding: 11px 14px; border-radius: 20px; outline: none; font-size: 14px; }
-  input#text::placeholder { color: #708499; }
-  button.send { background: #5288c1; color: white; border: none; padding: 11px 18px; border-radius: 20px; font-size: 14px; cursor: pointer; font-weight: bold; }
-  button.send:active { background: #3d6b9e; }
-
+  .msg-wrap { display: flex; flex-direction: column; max-width: 80%; }
+  .msg-wrap.mine { align-self: flex-start; align-items: flex-start; }
+  .msg-wrap.theirs { align-self: flex-end; align-items: flex-end; }
+  .msg { padding: 8px 12px; border-radius: 14px; word-wrap: break-word; font-size: 14px; line-height: 1.4; position: relative; }
+  .me { background: var(--my-msg); color: white; border-bottom-left-radius: 4px; }
+  .other { background: var(--other-msg); color: var(--text); border-bottom-right-radius: 4px; }
+  .name { font-size: 11px; color: var(--name); margin-bottom: 3px; font-weight: bold; }
+  .time { font-size: 10px; color: var(--text2); margin-top: 5px; border-top: 1px solid rgba(128,128,128,0.2); padding-top: 3px; }
+  .reaction { font-size: 16px; margin-top: 2px; }
+  .deleted { font-style: italic; opacity: 0.6; }
+  .msg-img { max-width: 100%; border-radius: 8px; margin-top: 3px; }
+  .msg-audio { width: 200px; margin-top: 3px; }
+  .input-box { background: var(--panel); padding: 8px; display: flex; gap: 6px; flex-shrink: 0; align-items: center; }
+  input#text { flex: 1; background: var(--panel2); border: none; color: var(--text); padding: 11px 14px; border-radius: 20px; outline: none; font-size: 14px; }
+  input#text::placeholder { color: var(--text2); }
+  button.icon-btn { background: var(--panel2); color: var(--text); border: none; padding: 10px; border-radius: 50%; font-size: 16px; cursor: pointer; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; }
+  button.icon-btn:active { background: var(--accent); }
+  button.send { background: var(--accent); color: white; border: none; padding: 11px 18px; border-radius: 20px; font-size: 14px; cursor: pointer; font-weight: bold; }
+  button.send:active { background: var(--accent2); }
+  .settings-screen { position: fixed; inset: 0; background: var(--bg); z-index: 120; overflow-y: auto; }
+  .settings-header { background: var(--panel); color: var(--text); padding: 15px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--panel2); }
+  .settings-header h2 { font-size: 17px; }
+  .settings-list { padding: 10px; }
+  .setting-item { background: var(--panel); color: var(--text); padding: 15px; margin-bottom: 8px; border-radius: 10px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
+  .setting-item:active { background: var(--panel2); }
+  .setting-item .label { font-size: 14px; }
+  .setting-item .value { color: var(--text2); font-size: 13px; }
+  .setting-item.danger { color: #e74c3c; }
+  .switch { width: 50px; height: 28px; background: var(--panel2); border-radius: 14px; position: relative; transition: background 0.3s; }
+  .switch.on { background: var(--online); }
+  .switch::after { content: ''; position: absolute; top: 3px; right: 3px; width: 22px; height: 22px; background: white; border-radius: 50%; transition: transform 0.3s; }
+  .switch.on::after { transform: translateX(-22px); }
+  .reaction-bar { display: flex; gap: 4px; background: var(--panel); border-radius: 20px; padding: 5px 10px; position: fixed; z-index: 200; box-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+  .reaction-bar span { font-size: 22px; cursor: pointer; padding: 3px; }
+  .reaction-bar span:active { transform: scale(1.3); }
+  .msg-menu { position: fixed; background: var(--panel); border-radius: 10px; padding: 5px; z-index: 200; box-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+  .msg-menu div { padding: 10px 20px; color: var(--text); font-size: 14px; cursor: pointer; border-radius: 6px; }
+  .msg-menu div:active { background: var(--panel2); }
+  .msg-menu div.danger { color: #e74c3c; }
+  .search-bar { background: var(--panel); padding: 8px 15px; display: flex; gap: 8px; border-bottom: 1px solid var(--panel2); }
+  .search-bar input { flex: 1; background: var(--panel2); border: none; color: var(--text); padding: 10px 14px; border-radius: 20px; outline: none; font-size: 14px; }
   .hidden { display: none !important; }
 </style>
 </head>
@@ -80,17 +109,21 @@
   </div>
 
   <div class="users-screen hidden" id="usersScreen">
-    <div class="profile-bar">
+    <div class="profile-bar" onclick="openSettings()">
       <div class="profile-avatar" id="myAvatar">👤</div>
       <div class="profile-info">
         <div class="profile-name" id="myName">---</div>
         <div class="profile-code" id="myCode">---</div>
       </div>
+      <div class="profile-arrow">⚙️</div>
     </div>
     <div class="users-header">
       <button class="hdr-btn" onclick="showMyQR()">QR من</button>
       <span>💬 چت‌های من</span>
       <button class="hdr-btn" onclick="startScan()">اسکن QR</button>
+    </div>
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="جستجو در پیام‌ها..." oninput="doSearch()">
     </div>
     <div class="users-list" id="usersList"></div>
     <button class="new-chat" onclick="newChat()">+</button>
@@ -109,6 +142,30 @@
     <button class="close-btn" onclick="stopScan()">لغو</button>
   </div>
 
+  <div class="settings-screen hidden" id="settingsScreen">
+    <div class="settings-header">
+      <button class="back-btn" onclick="closeSettings()">←</button>
+      <h2>تنظیمات</h2>
+    </div>
+    <div class="settings-list">
+      <div class="setting-item" onclick="changeName()">
+        <span class="label">✏️ تغییر اسم</span>
+        <span class="value" id="settingName">---</span>
+      </div>
+      <div class="setting-item" onclick="toggleTheme()">
+        <span class="label">🌙 حالت شب / روز</span>
+        <div class="switch on" id="themeSwitch"></div>
+      </div>
+      <div class="setting-item" onclick="alert('پیام‌نگار ما - نسخه ۱.۰\nساخته شده با ❤️')">
+        <span class="label">ℹ️ درباره</span>
+        <span class="value">۱.۰</span>
+      </div>
+      <div class="setting-item danger" onclick="logout()">
+        <span class="label">🚪 خروج از حساب</span>
+      </div>
+    </div>
+  </div>
+
   <div class="header hidden" id="header">
     <button class="back-btn" onclick="backToUsers()">←</button>
     <div class="header-info">
@@ -119,6 +176,9 @@
   </div>
   <div class="chat hidden" id="chat"></div>
   <div class="input-box hidden" id="inputBox">
+    <button class="icon-btn" onclick="document.getElementById('imgInput').click()">📷</button>
+    <input type="file" id="imgInput" accept="image/*" style="display:none" onchange="sendImage(this)">
+    <button class="icon-btn" id="micBtn" onmousedown="startRec()" onmouseup="stopRec()" ontouchstart="startRec(event)" ontouchend="stopRec(event)">🎤</button>
     <input type="text" id="text" placeholder="پیامت رو بنویس...">
     <button class="send" onclick="sendMsg()">➤</button>
   </div>
@@ -127,10 +187,13 @@
 let MY_NAME = "";
 let MY_ID = null;
 let MY_CODE = "";
+let MY_DARK = true;
 let CURRENT_CHAT_ID = null;
 let lastCount = 0;
 let html5Qr = null;
 let statusInterval = null;
+let mediaRecorder = null;
+let audioChunks = [];
 
 const scanCode = window.location.pathname.startsWith('/scan/') 
   ? window.location.pathname.split('/scan/')[1]
@@ -150,12 +213,14 @@ function enterChat() {
       MY_NAME = data.fullname;
       MY_ID = data.user_id;
       MY_CODE = data.code;
+      MY_DARK = data.dark_mode;
+      applyTheme();
       document.getElementById('login').classList.add('hidden');
       document.getElementById('myName').textContent = MY_NAME;
       document.getElementById('myCode').textContent = MY_CODE;
       document.getElementById('myAvatar').textContent = MY_NAME.charAt(0);
+      document.getElementById('settingName').textContent = MY_NAME;
       
-      // شروع heartbeat
       setInterval(() => {
         fetch('/heartbeat', {
           method: 'POST',
@@ -178,6 +243,56 @@ function enterChat() {
       } else { showUsers(); }
     } else { alert(data.error || 'خطا!'); }
   });
+}
+
+function applyTheme() {
+  if (MY_DARK) {
+    document.body.classList.remove('light');
+    document.getElementById('themeSwitch').classList.add('on');
+  } else {
+    document.body.classList.add('light');
+    document.getElementById('themeSwitch').classList.remove('on');
+  }
+}
+
+function toggleTheme() {
+  fetch('/toggle-theme', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({user_id: MY_ID})
+  }).then(r => r.json()).then(d => {
+    if (d.ok) { MY_DARK = d.dark_mode; applyTheme(); }
+  });
+}
+
+function changeName() {
+  const newName = prompt('اسم جدید:', MY_NAME);
+  if (!newName || newName === MY_NAME) return;
+  fetch('/change-name', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({user_id: MY_ID, new_name: newName})
+  }).then(r => r.json()).then(d => {
+    if (d.ok) {
+      MY_NAME = d.fullname;
+      document.getElementById('myName').textContent = MY_NAME;
+      document.getElementById('myAvatar').textContent = MY_NAME.charAt(0);
+      document.getElementById('settingName').textContent = MY_NAME;
+      alert('اسم عوض شد!');
+    } else { alert(d.error || 'خطا'); }
+  });
+}
+
+function logout() {
+  if (!confirm('از حساب خارج میشی؟')) return;
+  location.reload();
+}
+
+function openSettings() {
+  document.getElementById('settingsScreen').classList.remove('hidden');
+}
+function closeSettings() {
+  document.getElementById('settingsScreen').classList.add('hidden');
 }
 
 function showUsers() {
@@ -215,6 +330,26 @@ function loadContacts() {
   });
 }
 
+function doSearch() {
+  const q = document.getElementById('searchInput').value.trim();
+  if (!q) { loadContacts(); return; }
+  fetch('/search/' + CURRENT_CHAT_ID + '?q=' + encodeURIComponent(q))
+    .then(r => r.json()).then(results => {
+      const list = document.getElementById('usersList');
+      if (results.length === 0) {
+        list.innerHTML = '<div class="empty">چیزی پیدا نشد.</div>';
+        return;
+      }
+      list.innerHTML = '';
+      results.forEach(m => {
+        const div = document.createElement('div');
+        div.className = 'user-item';
+        div.innerHTML = '<div class="user-info"><div class="user-name">' + m.name + '</div><div class="user-status">' + m.text + ' — ' + m.time + '</div></div>';
+        list.appendChild(div);
+      });
+    });
+}
+
 function showMyQR() {
   document.getElementById('qrScreen').classList.remove('hidden');
   document.getElementById('qrImg').src = '/qr/' + MY_CODE;
@@ -230,9 +365,7 @@ function startScan() {
     { fps: 10, qrbox: 250 },
     (decodedText) => {
       let code = decodedText;
-      if (code.includes('/scan/')) {
-        code = code.split('/scan/')[1];
-      }
+      if (code.includes('/scan/')) code = code.split('/scan/')[1];
       stopScan();
       fetch('/user-by-code/' + code).then(r => r.json()).then(u => {
         if (u.ok && u.user_id !== MY_ID) {
@@ -240,133 +373,14 @@ function startScan() {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({owner_id: MY_ID, contact_id: u.user_id})
-          }).then(() => {
-            openChat(u.user_id, u.fullname);
-          });
-        } else {
-          alert('کاربر پیدا نشد یا خودت هستی!');
-        }
+          }).then(() => openChat(u.user_id, u.fullname));
+        } else { alert('کاربر پیدا نشد یا خودت هستی!'); }
       });
     },
     () => {}
-  ).catch(err => {
-    alert('خطا در باز کردن دوربین: ' + err);
-    stopScan();
-  });
+  ).catch(err => { alert('خطا: ' + err); stopScan(); });
 }
 
 function stopScan() {
   if (html5Qr) {
-    html5Qr.stop().then(() => { html5Qr.clear(); html5Qr = null; }).catch(() => {});
-  }
-  document.getElementById('scanScreen').classList.add('hidden');
-}
-
-function openChat(userId, userName) {
-  CURRENT_CHAT_ID = userId;
-  lastCount = 0;
-  if (statusInterval) clearInterval(statusInterval);
-  document.getElementById('usersScreen').classList.add('hidden');
-  document.getElementById('qrScreen').classList.add('hidden');
-  document.getElementById('scanScreen').classList.add('hidden');
-  document.getElementById('header').classList.remove('hidden');
-  document.getElementById('chat').classList.remove('hidden');
-  document.getElementById('inputBox').classList.remove('hidden');
-  document.getElementById('chatTitle').textContent = userName;
-  loadMsgs();
-  setInterval(loadMsgs, 1500);
-  // چک وضعیت مخاطب
-  checkChatStatus();
-  setInterval(checkChatStatus, 5000);
-}
-
-function checkChatStatus() {
-  if (!CURRENT_CHAT_ID) return;
-  fetch('/user-status/' + CURRENT_CHAT_ID).then(r => r.json()).then(s => {
-    if (s.ok) {
-      const el = document.getElementById('chatStatus');
-      if (s.online) {
-        el.textContent = 'آنلاین';
-        el.className = 'header-status online';
-      } else {
-        el.textContent = 'آخرین بازدید: ' + s.last_seen;
-        el.className = 'header-status';
-      }
-    }
-  });
-}
-
-function backToUsers() { showUsers(); }
-
-function newChat() {
-  const name = prompt('اسم و فامیل مخاطب:');
-  if (!name) return;
-  fetch('/login', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({fullname: name})
-  })
-  .then(r => r.json())
-  .then(data => { 
-    if (data.ok) { 
-      fetch('/add-contact', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({owner_id: MY_ID, contact_id: data.user_id})
-      });
-      openChat(data.user_id, data.fullname); 
-    }
-  });
-}
-
-function sendMsg() {
-  const text = document.getElementById('text').value.trim();
-  if (!text || !CURRENT_CHAT_ID) return;
-  fetch('/send', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({user_id: CURRENT_CHAT_ID, text: text})
-  });
-  document.getElementById('text').value = '';
-}
-
-function playSound() {
-  try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.frequency.value = 880;
-    osc.type = 'sine';
-    gain.gain.setValueAtTime(0.3, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
-    osc.start(ctx.currentTime);
-    osc.stop(ctx.currentTime + 0.3);
-  } catch(e) {}
-}
-
-function loadMsgs() {
-  if (!CURRENT_CHAT_ID) return;
-  fetch('/messages/' + CURRENT_CHAT_ID).then(r => r.json()).then(data => {
-    const chat = document.getElementById('chat');
-    if (data.length > lastCount && lastCount > 0) { playSound(); }
-    lastCount = data.length;
-    chat.innerHTML = '';
-    data.forEach(m => {
-      const div = document.createElement('div');
-      const mine = (m.user_id === MY_ID);
-      div.className = 'msg ' + (mine ? 'me' : 'other');
-      const senderLine = mine ? 'شما — ' + m.time : m.name + ' — ' + m.time + ' پیام داد';
-      div.innerHTML = (mine ? '' : '<div class="name">' + m.name + '</div>') + m.text + '<div class="time">' + senderLine + '</div>';
-      chat.appendChild(div);
-    });
-    chat.scrollTop = chat.scrollHeight;
-  });
-}
-
-document.getElementById('text').addEventListener('keypress', e => { if (e.key === 'Enter') sendMsg(); });
-document.getElementById('nameInput').addEventListener('keypress', e => { if (e.key === 'Enter') enterChat(); });
-</script>
-</body>
-</html>
+    html5Qr.stop().then(() => { ht
