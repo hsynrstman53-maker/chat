@@ -17,12 +17,20 @@
   .login button:active { background: #3d6b9e; }
 
   .users-screen { position: fixed; inset: 0; background: #0e1621; display: flex; flex-direction: column; z-index: 90; }
-  .users-header { background: #17212b; color: white; padding: 15px; text-align: center; font-size: 18px; font-weight: bold; }
+  .users-header { background: #17212b; color: white; padding: 15px; text-align: center; font-size: 18px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
+  .qr-btn { background: #5288c1; color: white; border: none; padding: 8px 12px; border-radius: 8px; font-size: 13px; cursor: pointer; }
+  .qr-btn:active { background: #3d6b9e; }
   .users-list { flex: 1; overflow-y: auto; padding: 10px; }
   .user-item { background: #17212b; color: white; padding: 15px; margin-bottom: 8px; border-radius: 10px; cursor: pointer; }
   .user-item:active { background: #242f3d; }
   .new-chat { position: fixed; bottom: 20px; right: 20px; background: #5288c1; color: white; border: none; width: 60px; height: 60px; border-radius: 50%; font-size: 28px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
   .new-chat:active { background: #3d6b9e; }
+
+  .qr-screen { position: fixed; inset: 0; background: #0e1621; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 30px; z-index: 110; }
+  .qr-screen h2 { color: white; font-size: 18px; margin-bottom: 20px; text-align: center; }
+  .qr-screen img { background: white; padding: 15px; border-radius: 15px; max-width: 250px; }
+  .qr-screen .code { color: #6ab2f2; font-size: 14px; margin-top: 15px; font-family: monospace; word-break: break-all; text-align: center; }
+  .qr-screen .close-btn { background: #5288c1; color: white; border: none; padding: 12px 30px; border-radius: 12px; font-size: 15px; cursor: pointer; margin-top: 20px; font-weight: bold; }
 
   .header { background: #17212b; color: white; padding: 12px; text-align: center; font-size: 16px; flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; }
   .back-btn { background: transparent; color: #6ab2f2; border: none; font-size: 20px; cursor: pointer; padding: 5px 10px; }
@@ -50,9 +58,19 @@
   </div>
 
   <div class="users-screen hidden" id="usersScreen">
-    <div class="users-header">💬 چت‌های من</div>
+    <div class="users-header">
+      <span>💬 چت‌های من</span>
+      <button class="qr-btn" onclick="showMyQR()">کد QR من</button>
+    </div>
     <div class="users-list" id="usersList"></div>
     <button class="new-chat" onclick="newChat()">+</button>
+  </div>
+
+  <div class="qr-screen hidden" id="qrScreen">
+    <h2>کد QR شما</h2>
+    <img id="qrImg" src="" alt="QR">
+    <div class="code" id="qrCode"></div>
+    <button class="close-btn" onclick="closeQR()">بستن</button>
   </div>
 
   <div class="header hidden" id="header">
@@ -69,8 +87,15 @@
 <script>
 let MY_NAME = "";
 let MY_ID = null;
+let MY_CODE = "";
 let CURRENT_CHAT_ID = null;
 let lastCount = 0;
+
+// چک کن اگه از لینک اسکن اومده
+const urlParams = new URLSearchParams(window.location.search);
+const scanCode = window.location.pathname.startsWith('/scan/') 
+  ? window.location.pathname.split('/scan/')[1] 
+  : null;
 
 function enterChat() {
   const name = document.getElementById('nameInput').value.trim();
@@ -85,8 +110,23 @@ function enterChat() {
     if (data.ok) {
       MY_NAME = data.fullname;
       MY_ID = data.user_id;
+      MY_CODE = data.code;
       document.getElementById('login').classList.add('hidden');
-      showUsers();
+      
+      // اگه از لینک اسکن اومده، مستقیم برو توی چت
+      if (scanCode) {
+        fetch('/user-by-code/' + scanCode)
+          .then(r => r.json())
+          .then(u => {
+            if (u.ok && u.user_id !== MY_ID) {
+              openChat(u.user_id, u.fullname);
+            } else {
+              showUsers();
+            }
+          });
+      } else {
+        showUsers();
+      }
     } else { alert(data.error || 'خطا!'); }
   });
 }
@@ -110,10 +150,21 @@ function showUsers() {
   });
 }
 
+function showMyQR() {
+  document.getElementById('qrScreen').classList.remove('hidden');
+  document.getElementById('qrImg').src = '/qr/' + MY_CODE;
+  document.getElementById('qrCode').textContent = MY_CODE;
+}
+
+function closeQR() {
+  document.getElementById('qrScreen').classList.add('hidden');
+}
+
 function openChat(userId, userName) {
   CURRENT_CHAT_ID = userId;
   lastCount = 0;
   document.getElementById('usersScreen').classList.add('hidden');
+  document.getElementById('qrScreen').classList.add('hidden');
   document.getElementById('header').classList.remove('hidden');
   document.getElementById('chat').classList.remove('hidden');
   document.getElementById('inputBox').classList.remove('hidden');
